@@ -3,9 +3,17 @@ from einops import rearrange
 from torch import Tensor
 from torch.nn.attention import SDPBackend, sdpa_kernel
 
+from loguru import logger
 
 
-def attention(q: Tensor, k: Tensor, v: Tensor, pe: Tensor) -> Tensor:
+def attention_naive(q: Tensor, k: Tensor, v: Tensor, pe: Tensor) -> Tensor:
+    q, k = apply_rope(q, k, pe)
+    x = torch.nn.functional.scaled_dot_product_attention(q, k, v)
+    x = rearrange(x, "B H L D -> B L (H D)")
+
+    return x
+
+def attention_replicate(q: Tensor, k: Tensor, v: Tensor, pe: Tensor) -> Tensor:
     q, k = apply_rope(q, k, pe)
     # Only enable flash attention backend
     with sdpa_kernel(SDPBackend.FLASH_ATTENTION):
@@ -31,3 +39,22 @@ def apply_rope(xq: Tensor, xk: Tensor, freqs_cis: Tensor) -> tuple[Tensor, Tenso
     xq_out = freqs_cis[..., 0] * xq_[..., 0] + freqs_cis[..., 1] * xq_[..., 1]
     xk_out = freqs_cis[..., 0] * xk_[..., 0] + freqs_cis[..., 1] * xk_[..., 1]
     return xq_out.reshape(*xq.shape).type_as(xq), xk_out.reshape(*xk.shape).type_as(xk)
+
+
+attention_mode = "replicate"
+
+def attention(q: Tensor, k: Tensor, v: Tensor, pe: Tensor) -> Tensor:
+    if attention_mode == "replicate":
+        return attention_replicate(q, k, v, pe)
+
+    elif attention_mode == "naive":
+        return attention_naive(q, k, v, pe)
+
+    else:
+        raise NotImplementedError
+
+def set_attention_mode(mode):
+    assert mode in ["naive", "replicate"]
+
+    global attention_mode
+    attention_mode = mode

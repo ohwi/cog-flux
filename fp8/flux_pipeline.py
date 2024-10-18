@@ -23,7 +23,7 @@ config.cache_size_limit = 10000000000
 ind_config.shape_padding = True
 import platform
 
-#from loguru import logger
+from loguru import logger
 from torchvision.transforms import functional as TF
 from tqdm import tqdm
 
@@ -750,6 +750,7 @@ class FluxPipeline:
             flow_model = models.flow
 
             if not config.prequantized_flow:
+                logger.info("Quantizing flow transformer and dispatching float8...")
                 flow_model = quantize_flow_transformer_and_dispatch_float8(
                     flow_model,
                     flux_device,
