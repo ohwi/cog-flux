@@ -508,44 +508,59 @@ def benchmark(
 if __name__ == '__main__':
     # Need to prepare models below mode-cache
     # See flux/util.py and wget/unzip each files
-    
+
     benchmark_kwargs = list()
-    benchmark_kwargs.append({
-        "compile_fp8": True,
-        "compile_bf16": False,
-        "max_autotune": True,
-        "attention_mode": "replicate",
-    })
+
+    # just for testing spending time
     benchmark_kwargs.append({
         "compile_fp8": True,
         "compile_bf16": False,
         "max_autotune": False,
-        "attention_mode": "replicate",
+        "attention_mode": "fa3",
     })
-    benchmark_kwargs.append({
-        "compile_fp8": True,
-        "compile_bf16": False,
-        "max_autotune": False,
-        "attention_mode": "naive",
-    })
-    benchmark_kwargs.append({
-        "compile_fp8": False,
-        "compile_bf16": True,
-        "max_autotune": True,
-        "attention_mode": "naive",
-    })
-    benchmark_kwargs.append({
-        "compile_fp8": False,
-        "compile_bf16": True,
-        "max_autotune": False,
-        "attention_mode": "naive",
-    })
-    benchmark_kwargs.append({
-        "compile_fp8": False,
-        "compile_bf16": True,
-        "max_autotune": False,
-        "attention_mode": "replicate",
-    })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": True,
+    #     "compile_bf16": False,
+    #     "max_autotune": False,
+    #     "attention_mode": "int8",
+    # })
+
+    # benchmark_kwargs.append({
+    #     "compile_fp8": True,
+    #     "compile_bf16": False,
+    #     "max_autotune": True,
+    #     "attention_mode": "replicate",
+    # })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": True,
+    #     "compile_bf16": False,
+    #     "max_autotune": False,
+    #     "attention_mode": "replicate",
+    # })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": True,
+    #     "compile_bf16": False,
+    #     "max_autotune": False,
+    #     "attention_mode": "naive",
+    # })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": False,
+    #     "compile_bf16": True,
+    #     "max_autotune": True,
+    #     "attention_mode": "naive",
+    # })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": False,
+    #     "compile_bf16": True,
+    #     "max_autotune": False,
+    #     "attention_mode": "naive",
+    # })
+    # benchmark_kwargs.append({
+    #     "compile_fp8": False,
+    #     "compile_bf16": True,
+    #     "max_autotune": False,
+    #     "attention_mode": "replicate",
+    # })
 
     results = []
     for kwargs in benchmark_kwargs:
